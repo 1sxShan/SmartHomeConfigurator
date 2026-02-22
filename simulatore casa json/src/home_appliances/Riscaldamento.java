@@ -1,64 +1,27 @@
 package home_appliances;
 
-import simulation.Clock;
+import exception.MissingArgumentConfigurationException;
+import org.json.JSONObject;
 
-import java.util.Objects;
+public class Riscaldamento extends Elettrodomestico {
+    private final double temperaturaDesiderata;
 
-public abstract class Riscaldamento {
-    private final String nome;
-    private boolean acceso;
-    private final double consumoOrario;
-    private double consumoAccumulato;
-    private final float desiredTemperature;
+    public Riscaldamento(JSONObject config) {
+        super(config); // Convalida 'consumo_orario'
 
-    public Riscaldamento(String nome, double consumoOrario, float desiredTemperature) {
-        this.nome = nome;
-        this.consumoOrario = consumoOrario;
-        this.acceso = false;
-        this.consumoAccumulato = 0;
-        this.desiredTemperature = desiredTemperature;
-    }
-
-    public void aggiornaConsumo() {
-        if (acceso) {
-            consumoAccumulato += consumoOrario;
+        if (!config.has("temperatura_desiderata")) {
+            throw new MissingArgumentConfigurationException("Manca 'temperatura_desiderata' per il Riscaldamento.");
         }
-    }
-
-    public void ChangeStatus (Clock clock) {
-        setAcceso(clock.getTemperature() < getDesiredTemperature());
-    }
-
-    public boolean isAcceso() {
-        return acceso;
-    }
-
-    public void setAcceso(boolean acceso) {
-        this.acceso = acceso;
-    }
-
-    public double getConsumoOrario() {
-        return consumoOrario;
-    }
-
-    public float getDesiredTemperature() {
-        return desiredTemperature;
+        this.temperaturaDesiderata = config.getDouble("temperatura_desiderata");
     }
 
     @Override
-    public String toString() {
-        return String.format("%s [%s] - Consumo orario: %.2f kW - Consumo accumulato: %.2f kWh",
-                nome, acceso ? "ACCESO" : "SPENTO", consumoOrario, consumoAccumulato);
+    public double getConsumoEffettivo() {
+        // Logica di configurazione: più alta è la temperatura impostata, maggiore è il carico base
+        return consumoBase * (temperaturaDesiderata / 20.0);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(nome, acceso, consumoOrario, consumoAccumulato, desiredTemperature);
+    public double getTemperaturaDesiderata() {
+        return temperaturaDesiderata;
     }
 }

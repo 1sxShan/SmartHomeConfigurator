@@ -6,29 +6,18 @@ import org.json.JSONObject;
 public class Frigo extends Elettrodomestico {
     private final double temperatura;
 
-    public Frigo(JSONObject refrigeratorConfig, String keyName) {
-        super(costoEffettivo(refrigeratorConfig, keyName));
+    public Frigo(JSONObject config) {
+        super(config);
 
-        if (!refrigeratorConfig.has(keyName)) {
-            throw new MissingArgumentConfigurationException(String.format("%s non è presente nella configurazione", keyName));
+        if (!config.has("temperatura")) {
+            throw new MissingArgumentConfigurationException("Manca 'temperatura' per Frigo.");
         }
-        this.temperatura = refrigeratorConfig.getInt(keyName);
-        acceso = true;
+        this.temperatura = config.getDouble("temperatura");
     }
 
-    private static double costoEffettivo(JSONObject refrigeratorConfig, String keyName) {
-        if (!refrigeratorConfig.has("consumo_orario")) {
-            throw new MissingArgumentConfigurationException(String.format("%s non è presente nella configurazione", "consumo_orario"));
-        }
-        double consume = refrigeratorConfig.getDouble("consumo_orario");
-
-        if (!refrigeratorConfig.has(keyName)) {
-            throw new MissingArgumentConfigurationException(String.format("%s non è presente nella configurazione", keyName));
-        }
-        double temperatura = refrigeratorConfig.getDouble(keyName);
-
-        return consume * (8 / temperatura);
-
+    @Override
+    public double getConsumoEffettivo() {
+        // Esempio: più è bassa la temperatura, più consuma rispetto al base
+        return consumoBase * (8.0 / temperatura);
     }
-
 }

@@ -6,24 +6,18 @@ import org.json.JSONObject;
 public class Lavatrice extends Elettrodomestico {
     private final int velocitaCentrifuga;
 
-    public Lavatrice(JSONObject washingMachineConfig,String keyName) {
-        super(consumoEffettivo(washingMachineConfig,keyName));
+    public Lavatrice(JSONObject config) {
+        super(config); // Estrae il consumoBase
 
-        if (!washingMachineConfig.has(keyName)) {
-            throw new MissingArgumentConfigurationException(String.format("%s non è presente nella configurazione", keyName));
+        if (!config.has("velocita_centrifuga")) {
+            throw new MissingArgumentConfigurationException("Manca 'velocita_centrifuga' per Lavatrice.");
         }
-        this.velocitaCentrifuga = washingMachineConfig.getInt(keyName);
+        this.velocitaCentrifuga = config.getInt("velocita_centrifuga");
     }
-    private static double consumoEffettivo(JSONObject washingMachineConfig,String keyName) {
-        if (!washingMachineConfig.has("consumo_orario")) {
-            throw new MissingArgumentConfigurationException(String.format("%s non è presente nella configurazione", "consumo_orario"));
-        }
-        double consume = washingMachineConfig.getDouble("consumo_orario");
 
-        if (!washingMachineConfig.has(keyName)) {
-            throw new MissingArgumentConfigurationException(String.format("%s non è presente nella configurazione", keyName));
-        }
-        int velocitaCentrifuga = washingMachineConfig.getInt(keyName);
-        return consume * (velocitaCentrifuga / 1200.0);
+    @Override
+    public double getConsumoEffettivo() {
+        // Logica di calcolo basata sulla configurazione
+        return consumoBase * (velocitaCentrifuga / 1200.0);
     }
 }

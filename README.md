@@ -1,149 +1,113 @@
-# Simulatore di Consumo Energetico Domestico
+# Configuratore di Elettrodomestici Domestici
 
-Un'applicazione Java per simulare il consumo energetico di una casa, inclusi elettrodomestici, sistemi di riscaldamento e pannelli fotovoltaici.
+Un'applicazione Java per configurare e gestire gli elettrodomestici di una casa, con supporto per modalità operative, classi energetiche e calcolo dei consumi.
 
 ## Descrizione
 
-Questo progetto simula il consumo energetico di una abitazione nel tempo, tenendo conto di:
-- Vari elettrodomestici con comportamenti diversi
-- Sistemi di riscaldamento che si attivano in base alla temperatura
-- Pannelli fotovoltaici che producono energia in base alla stagione e all'irradiazione solare
-- Variazioni stagionali della temperatura e dell'irradiazione solare
+Il progetto permette di gestire una casa con i suoi elettrodomestici, tenendo conto di:
+- Consumo energetico specifico per ogni tipo di elettrodomestico
+- Modalità operative (ECO, Adaptive, Performance)
+- Classe energetica (A → G)
+- Persistenza della configurazione tramite file JSON
 
 ## Struttura del Progetto
 
-### Package Principal
+### Package
 
-- **`simulation`**: Contiene le classi core della simulazione
+- **`configuration`**: Contiene le classi per la gestione della configurazione
 - **`home_appliances`**: Contiene le classi degli elettrodomestici
 - **`exception`**: Contiene le eccezioni personalizzate
 
 ### Classi Principali
 
-#### Package `simulation`
-- **`Casa`**: Classe principale che rappresenta una casa con tutti i suoi componenti
-- **`Simulatore`**: Gestisce l'esecuzione della simulazione
-- **`Clock`**: Gestisce il tempo della simulazione (ore, giorni, stagioni)
-- **`Stagione`**: Gestisce l'irradiazione solare in base alla stagione
-- **`Season`**: Enumerazione delle stagioni
+#### Package `configuration`
+- **`Casa`**: Classe contenitore per gli elettrodomestici, espone `addAppliance` e `delAppliance`
+- **`ConfigurationLoader`**: Legge `config.json` e inizializza gli oggetti tramite `parseAppliance`
+- **`ConfigurationSaver`**: Serializza lo stato corrente della casa in `config.json`
 
 #### Package `home_appliances`
-- **`Elettrodomestico`**: Classe astratta base per tutti gli elettrodomestici
-- **`Lavatrice`**: Rappresenta una lavatrice
-- **`Lavastoviglie`**: Rappresenta una lavastoviglie
-- **`Asciugatrice`**: Rappresenta un'asciugatrice
-- **`Frigo`**: Rappresenta un frigorifero
-- **`PannelliFotovoltaici`**: Rappresenta pannelli solari fotovoltaici
-- **`Riscaldamento`**: Classe astratta per i sistemi di riscaldamento
+- **`Elettrodomestico`**: Classe astratta base, gestisce `Modalita` e `ClasseEnergetica`
+- **`Lavatrice`**: Parametro specifico: `velocita_centrifuga`
+- **`Lavastoviglie`**: Parametro specifico: `programma` (1=Eco, 2=Intensivo, 3=Rapido)
+- **`Asciugatrice`**: Parametro specifico: `temperatura_asciugatura`
+- **`Frigo`**: Parametro specifico: `temperatura`
+- **`PannelliFotovoltaici`**: Parametri specifici: `superficie`, `num_pannelli` — produce energia (consumo negativo)
+- **`Riscaldamento`**: Parametro specifico: `temperatura_desiderata`
 
 #### Package `exception`
-- **`ApplianceDoesntExistException`**: Eccezione per elettrodomestici non riconosciuti
-- **`MissingArgumentConfigurationException`**: Eccezione per parametri di configurazione mancanti
+- **`ApplianceDoesntExistException`**: Tipo di elettrodomestico non riconosciuto nel JSON
+- **`MissingArgumentConfigurationException`**: Parametro obbligatorio mancante nel JSON
+
+### Enum
+- **`Modalita`**: `ECO` (×0.8), `ADAPTIVE` (×1.0), `PERFORMANCE` (×1.3)
+- **`ClasseEnergetica`**: `A`, `B`, `C`, `D`, `E`, `F`, `G` — informativa, inserita dall'utente
 
 ## Configurazione
 
-Il sistema utilizza un file JSON (`config.json`) per configurare la simulazione:
+Il sistema utilizza un file JSON (`config.json`) per caricare e salvare la configurazione della casa.
 
-### Struttura del file di configurazione:
+### Struttura del file:
 ```json
 {
-  "simulazione": {
-    "durata_ore": 24,
-    "costo_kwh": 0.20,
-    "stagione": "estate"
-  },
-  "elettrodomestici": [
-    {
-      "tipo": "Lavatrice",
-      "velocita_centrifuga": 1400,
-      "consumo_orario": 2.0
-    },
-    ...
-  ],
-  "riscaldamento": [
-    {
-      "tipo": "Termoventilatore",
-      "consumo_orario": 1.6,
-      "temperatura_desiderata": 15.0
-    },
-    ...
+  "nome_casa": "Casa Smart",
+  "costo_kwh": 0.22,
+  "dispositivi": [
+    { "tipo": "lavatrice", "velocita_centrifuga": 1000, "modalita": "ADAPTIVE", "classe_energetica": "A" },
+    { "tipo": "frigo", "temperatura": 4, "modalita": "ECO", "classe_energetica": "A" },
+    { "tipo": "lavastoviglie", "programma": 2, "modalita": "PERFORMANCE", "classe_energetica": "B" },
+    { "tipo": "asciugatrice", "temperatura_asciugatura": 60, "modalita": "ADAPTIVE", "classe_energetica": "C" },
+    { "tipo": "pannelli", "superficie": 12.5, "num_pannelli": 5, "modalita": "ADAPTIVE", "classe_energetica": "A" },
+    { "tipo": "riscaldamento", "temperatura_desiderata": 21.0, "modalita": "ECO", "classe_energetica": "B" }
   ]
 }
 ```
 
-### Parametri supportati:
+### Parametri per tipo:
 
-#### Elettrodomestici:
-- **Lavatrice**: `tipo`, `velocita_centrifuga`, `consumo_orario`
-- **Lavastoviglie**: `tipo`, `programma`, `consumo_orario`
-- **Asciugatrice**: `tipo`, `temperatura_asciugatura`, `consumo_orario`
-- **Frigorifero**: `tipo`, `temperatura`, `consumo_orario`
-- **PannelliFotovoltaici**: `tipo`, `n_pannelli`, `area`, `rendimento`, `consumo_orario`
+| Tipo             | Parametro specifico       | Unità  |
+|------------------|---------------------------|--------|
+| `lavatrice`      | `velocita_centrifuga`     | rpm    |
+| `frigo`          | `temperatura`             | °C     |
+| `lavastoviglie`  | `programma`               | 1/2/3  |
+| `asciugatrice`   | `temperatura_asciugatura` | °C     |
+| `pannelli`       | `superficie`, `num_pannelli` | m², n |
+| `riscaldamento`  | `temperatura_desiderata`  | °C     |
 
-#### Riscaldamento:
-- `tipo`: Nome del sistema di riscaldamento
-- `consumo_orario`: Consumo in kWh all'ora
-- `temperatura_desiderata`: Temperatura alla quale si attiva il sistema
-
-## Output della Simulazione
-
-La simulazione produce un output che include:
-- Informazioni iniziali sulla simulazione
-- Stato della simulazione durante l'esecuzione
-- Risultati finali:
-  - Consumo totale degli elettrodomestici
-  - Energia prodotta dai pannelli fotovoltaici
-  - Consumo netto (consumo - produzione)
-  - Costo stimato
-  - Risparmio grazie ai pannelli fotovoltaici
-  - Costo finale
+Tutti i tipi accettano anche `modalita` e `classe_energetica`.
 
 ## Funzionalità
 
-### Gestione del Tempo
-- Simulazione di ore, giorni e stagioni
-- Variazione della temperatura in base alla stagione e all'ora del giorno
-- Cambi stagionali automatici
+**`1.`** **Aggiungere** un elettrodomestico, specificando tipo, modalità, classe energetica e parametri specifici
 
-### Elettrodomestici
-- Accensione/spegnimento programmato
-- Consumo variabile in base ai parametri (es. velocità centrifuga, programma)
-- Frigo sempre acceso
-- Pannelli fotovoltaici con produzione variabile in base all'irradiazione
+**`2.`** **Visualizzare** la casa con tutti gli elettrodomestici, la loro classe energetica, modalità e consumo effettivo
 
-### Riscaldamento
-- Attivazione automatica quando la temperatura scende sotto la soglia desiderata
-- Consumo orario costante quando attivi
+**`3.`** **Modificare** modalità e classe energetica di un elettrodomestico esistente
 
-### Schedulazione Automatica
-- Lavastoviglie: attivazione alle 8:00 e 20:00
-- Lavatrice e Asciugatrice: attivazione il giorno 0 e 3 di ogni settimana alle 10:00
+**`4.`** **Rimuovere** un elettrodomestico dalla casa
 
-## Esempio di Configurazione
+**`5.`** **Salvare** la configurazione corrente su `config.json`
 
-Vedi il file `config.json` incluso per un esempio completo con:
-- 7 elettrodomestici diversi
-- 17 sistemi di riscaldamento di vari tipi
-- Pannelli fotovoltaici
-- Simulazione di 24 ore in estate
+## Calcolo dei Consumi
 
-## Calcoli Energetici
+Il consumo effettivo di ogni elettrodomestico è calcolato come:
 
-1. **Consumo elettrodomestici**: Somma dei consumi orari di tutti gli elettrodomestici accesi
-2. **Consumo riscaldamento**: Somma dei consumi dei sistemi attivi
-3. **Produzione pannelli**: Calcolata in base a:
-   - Numero di pannelli
-   - Area
-   - Rendimento
-   - Irradiazione solare (dipendente da stagione e ora del giorno)
-4. **Consumo netto**: Consumo totale - produzione pannelli
-5. **Costo totale**: Consumo netto × costo per kWh
+```
+consumoEffettivo = consumoSpecifico() × moltiplicatoreModalità
+```
+
+Dove `consumoSpecifico()` varia per ogni tipo:
+- **Lavatrice**: proporzionale alla velocità di centrifuga
+- **Frigo**: inversamente proporzionale alla temperatura
+- **Lavastoviglie**: dipende dal programma scelto
+- **Asciugatrice**: proporzionale alla temperatura di asciugatura
+- **Pannelli**: valore negativo (produzione di energia)
+- **Riscaldamento**: proporzionale alla temperatura desiderata
 
 ## Risoluzione Problemi
 
-### Errori Comuni:
-1. **File JSON non trovato**: Verificare il percorso del file di configurazione
-2. **Parametri mancanti**: Tutti i parametri richiesti devono essere presenti nel JSON
-3. **Tipo elettrodomestico non riconosciuto**: Verificare l'ortografia nel campo "tipo"
-
-
+| Errore | Causa | Soluzione |
+|--------|-------|-----------|
+| `RuntimeException: Errore durante il caricamento` | File JSON non trovato o malformato | Verificare il percorso e la sintassi del file |
+| `ApplianceDoesntExistException` | Valore di `tipo` non riconosciuto | Usare uno dei tipi supportati (vedi tabella) |
+| `MissingArgumentConfigurationException` | Parametro obbligatorio assente | Aggiungere il campo mancante nel JSON |
+| `IndexOutOfBoundsException` | Indice non valido nella rimozione | Verificare l'indice con la lista visualizzata |

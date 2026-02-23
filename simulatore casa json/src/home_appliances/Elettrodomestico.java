@@ -1,19 +1,29 @@
 package home_appliances;
 
-import exception.MissingArgumentConfigurationException;
 import org.json.JSONObject;
 
 public abstract class Elettrodomestico {
-    protected double consumoBase;
+    protected Modalita modalita;
+    protected ClasseEnergetica classeEnergetica;
 
     public Elettrodomestico(JSONObject obj) {
-        // Controllo se il campo base è presente come da UML
-        if (!obj.has("consumo_orario")) {
-            throw new MissingArgumentConfigurationException("Parametro 'consumo_orario' mancante.");
-        }
-        this.consumoBase = obj.getDouble("consumo_orario");
+        String mod = obj.optString("modalita", "ADAPTIVE").toUpperCase();
+        this.modalita = Modalita.valueOf(mod);
+
+        String classe = obj.optString("classe_energetica", "C").toUpperCase();
+        this.classeEnergetica = ClasseEnergetica.valueOf(classe);
     }
 
-    // Metodo astratto per il calcolo specifico di ogni dispositivo
-    public abstract double getConsumoEffettivo();
+    public double getConsumoEffettivo() {
+        return consumoSpecifico() * modalita.moltiplicatore();
+    }
+
+    public ClasseEnergetica getClasseEnergetica() { return classeEnergetica; }
+    public void setClasseEnergetica(ClasseEnergetica c) { this.classeEnergetica = c; }
+    public Modalita getModalita() { return modalita; }
+    public void setModalita(Modalita m) { this.modalita = m; }
+
+    protected abstract double consumoBase();
+    protected abstract double consumoSpecifico();
+    public abstract JSONObject toJSON();
 }

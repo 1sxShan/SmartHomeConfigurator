@@ -2,8 +2,11 @@
   "nome_casa": "Casa Smart",
   "costo_kwh": 0.22,
   "dispositivi": [
-    { "tipo": "lavatrice", "consumo_orario": 1.2, "velocita_centrifuga": 1000 },
-    { "tipo": "frigo", "consumo_orario": 0.1, "temperatura": 4 },
-    { "tipo": "riscaldamento", "consumo_orario": 2.5, "temperatura_desiderata": 20.5 }
+    { "tipo": "lavatrice", "velocita_centrifuga": 1000, "modalita": "ADAPTIVE", "classe_energetica": "A" },
+    { "tipo": "frigo", "temperatura": 4, "modalita": "ECO", "classe_energetica": "A" },
+    { "tipo": "lavastoviglie", "programma": 2, "modalita": "PERFORMANCE", "classe_energetica": "B" },
+    { "tipo": "asciugatrice", "temperatura_asciugatura": 60, "modalita": "ADAPTIVE", "classe_energetica": "C" },
+    { "tipo": "pannelli", "superficie": 12.5, "num_pannelli": 5, "modalita": "ADAPTIVE", "classe_energetica": "A" },
+    { "tipo": "riscaldamento", "temperatura_desiderata": 21.0, "modalita": "ECO", "classe_energetica": "B" }
   ]
 }

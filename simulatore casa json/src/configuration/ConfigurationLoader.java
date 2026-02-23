@@ -36,7 +36,7 @@ public class ConfigurationLoader {
         }
     }
 
-    private Elettrodomestico parseAppliance(JSONObject json) {
+    public Elettrodomestico parseAppliance(JSONObject json) {
         String tipo = json.getString("tipo").toLowerCase();
 
         return switch (tipo) {

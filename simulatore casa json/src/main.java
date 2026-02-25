@@ -6,8 +6,10 @@ import java.util.Scanner;
 Scanner sc = new Scanner(System.in);
 
 void main() {
+    final String filePath = "simulatore casa json/src/config.json";
+
     var configLoader = new ConfigurationLoader();
-    var casa = configLoader.loadConfig("simulatore casa json/src/config.json");
+    var casa = configLoader.loadConfig(filePath);
 
     int choice;
     do {
@@ -16,24 +18,28 @@ void main() {
         sc.nextLine();
 
         switch (choice) {
-            case 1 -> aggiungiElettrodomestico(casa, configLoader);
-            case 2 -> visualizzaCasa(casa);
-            case 3 -> modificaElettrodomestico(casa);
-            case 4 -> rimuoviElettrodomestico(casa);
-            case 5 -> new ConfigurationSaver().saveConfig("simulatore casa json/src/config.json", casa);
-            case 0 -> System.out.println("Arrivederci!");
-            default -> System.out.println("Scelta non valida.");
+            case 1:
+                aggiungiElettrodomestico(casa, configLoader);break;
+            case 2:
+                 visualizzaCasa(casa);break;
+            case 3:
+                 rimuoviElettrodomestico(casa);break;
+            case 4:
+                 new ConfigurationSaver().saveConfig(filePath, casa);break;
+            case 0:
+                 System.out.println("fine");break;
+            default:
+                 System.out.println("Scelta non valida");break;
         }
     } while (choice != 0);
 }
 
 void printMenu() {
-    System.out.println("\n--- MENU ---");
+    System.out.println("\n MENU ----------");
     System.out.println("1. Aggiungi elettrodomestico");
     System.out.println("2. Visualizza casa");
-    System.out.println("3. Modifica elettrodomestico");
-    System.out.println("4. Rimuovi elettrodomestico");
-    System.out.println("5. Salva configurazione");
+    System.out.println("3. Rimuovi elettrodomestico");
+    System.out.println("4. Salva configurazione");
     System.out.println("0. Esci");
     System.out.print("Scelta: ");
 }
@@ -96,29 +102,13 @@ void visualizzaCasa(Casa casa) {
     var lista = casa.getElettrodomestici();
     for (int i = 0; i < lista.size(); i++) {
         var e = lista.get(i);
-        System.out.printf("  %d. %-20s | Classe: %s | Modalità: %-11s | Consumo: %.3f kWh%n",
-                i,
-                e.getClass().getSimpleName(),
-                e.getClasseEnergetica(),
-                e.getModalita(),
-                e.getConsumoEffettivo());
+        System.out.printf(  i + ")  " + e.getClass().getSimpleName() + " | " +  e.getClasseEnergetica() +" | "+e.getModalita() + " | " +  e.getConsumoEffettivo()+"\n");
+
     }
 }
 
-void modificaElettrodomestico(Casa casa) {
-    var lista = casa.getElettrodomestici();
-    visualizzaCasa(casa);
-    System.out.print("Indice da modificare: ");
-    int idx = sc.nextInt(); sc.nextLine();
-    if (idx < 0 || idx >= lista.size()) { System.out.println("Indice non valido."); return; }
 
-    var e = lista.get(idx);
-    System.out.print("Nuova modalità (ECO/ADAPTIVE/PERFORMANCE): ");
-    e.setModalita(Modalita.valueOf(sc.nextLine().trim().toUpperCase()));
-    System.out.print("Nuova classe energetica (A/B/C/D/E/F/G): ");
-    e.setClasseEnergetica(ClasseEnergetica.valueOf(sc.nextLine().trim().toUpperCase()));
-    System.out.println("Modificato.");
-}
+
 
 void rimuoviElettrodomestico(Casa casa) {
     visualizzaCasa(casa);

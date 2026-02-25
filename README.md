@@ -110,4 +110,3 @@ Dove `consumoSpecifico()` varia per ogni tipo:
 | `RuntimeException: Errore durante il caricamento` | File JSON non trovato o malformato | Verificare il percorso e la sintassi del file |
 | `ApplianceDoesntExistException` | Valore di `tipo` non riconosciuto | Usare uno dei tipi supportati (vedi tabella) |
 | `MissingArgumentConfigurationException` | Parametro obbligatorio assente | Aggiungere il campo mancante nel JSON |
-| `IndexOutOfBoundsException` | Indice non valido nella rimozione | Verificare l'indice con la lista visualizzata |

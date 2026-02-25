@@ -10,16 +10,17 @@ import java.io.FileReader;
 public class ConfigurationLoader {
 
     public Casa loadConfig(String filePath) {
+
         try (FileReader reader = new FileReader(filePath)) {
             JSONObject root = new JSONObject(new JSONTokener(reader));
 
-            // Creiamo l'oggetto Casa con i dati generali
+            // Crea Casa con i dati generali
             Casa casa = new Casa(
                     root.getString("nome_casa"),
                     root.getDouble("costo_kwh")
             );
 
-            // Prendiamo l'array dei dispositivi
+            //  crea array dei dispositivi
             JSONArray dispositivi = root.getJSONArray("dispositivi");
 
             for (int i = 0; i < dispositivi.length(); i++) {
@@ -31,7 +32,7 @@ public class ConfigurationLoader {
             return casa;
 
         } catch (Exception e) {
-            // Gestisce errori di lettura file o JSON malformati
+            // errori file
             throw new RuntimeException("Errore durante il caricamento della configurazione: " + e.getMessage());
         }
     }

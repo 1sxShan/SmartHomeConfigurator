@@ -81,11 +81,9 @@ Tutti i tipi accettano anche `modalita` e `classe_energetica`.
 
 **`2.`** **Visualizzare** la casa con tutti gli elettrodomestici, la loro classe energetica, modalità e consumo effettivo
 
-**`3.`** **Modificare** modalità e classe energetica di un elettrodomestico esistente
+**`3.`** **Rimuovere** un elettrodomestico dalla casa
 
-**`4.`** **Rimuovere** un elettrodomestico dalla casa
-
-**`5.`** **Salvare** la configurazione corrente su `config.json`
+**`4.`** **Salvare** la configurazione corrente su `config.json`
 
 ## Calcolo dei Consumi
 

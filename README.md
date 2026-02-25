@@ -8,7 +8,7 @@ Il progetto permette di gestire una casa con i suoi elettrodomestici, tenendo co
 - Consumo energetico specifico per ogni tipo di elettrodomestico
 - Modalità operative (ECO, Adaptive, Performance)
 - Classe energetica (A → G)
-- Persistenza della configurazione tramite file JSON
+- Configurazione tramite file JSON
 
 ## Struttura del Progetto
 
@@ -23,7 +23,7 @@ Il progetto permette di gestire una casa con i suoi elettrodomestici, tenendo co
 #### Package `configuration`
 - **`Casa`**: Classe contenitore per gli elettrodomestici, espone `addAppliance` e `delAppliance`
 - **`ConfigurationLoader`**: Legge `config.json` e inizializza gli oggetti tramite `parseAppliance`
-- **`ConfigurationSaver`**: Serializza lo stato corrente della casa in `config.json`
+- **`ConfigurationSaver`**: Salva lo stato corrente della casa in `config.json`
 
 #### Package `home_appliances`
 - **`Elettrodomestico`**: Classe astratta base, gestisce `Modalita` e `ClasseEnergetica`
